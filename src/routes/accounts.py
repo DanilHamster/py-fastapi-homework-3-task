@@ -89,7 +89,7 @@ async def activate(model: TokenActivate, db: AsyncSession = Depends(get_db)):
             status_code=400, detail="Invalid or expired activation token."
         )
     user_status.is_active = True
-    await db.commit()
+    await db.flush()
     await db.refresh(user_status)
     await db.delete(db_token)
     await db.commit()
@@ -151,7 +151,6 @@ async def password_reset_compleat(
                 status_code=400, detail="Invalid email or token."
             )
         await db.delete(db_check_token)
-        await db.commit()
         new_pass = hash_password(model.password)
         user._hashed_password = new_pass
         await db.commit()
